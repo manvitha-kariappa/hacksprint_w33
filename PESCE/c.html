@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>C study group</title>
+</head>
+<body>
+    <h1>C programing class</h1>
+    <div id="videos">
+        <video id="localVideo" autoplay></video>
+        <video id="remoteVideo" autoplay></video>
+    </div>
+    <div id="captions"></div>
+
+    <script>
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        .then(function (stream) {
+            var localVideo = document.getElementById('localVideo');
+            localVideo.srcObject = stream;
+            
+            var configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+            var peerConnection = new RTCPeerConnection(configuration);
+            stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
+
+            peerConnection.ontrack = function (event) {
+                var remoteVideo = document.getElementById('remoteVideo');
+                remoteVideo.srcObject = event.streams[0];
+            };
+
+            // Code to initiate a call and set up a connection goes here
+            // This may involve signaling server, handling offer/answer, etc.
+
+            // Using Google Speech Recognition API for captions
+            var recognition = new webkitSpeechRecognition() || new SpeechRecognition();
+            recognition.lang = 'en-US'; // Set the language (if needed)
+            recognition.onresult = function(event) {
+                var caption = event.results[0][0].transcript;
+                document.getElementById('captions').innerText = caption;
+                // Send 'caption' to display real-time captions.
+                // You may need to format and display this within your video call interface.
+            };
+
+            recognition.start();
+        })
+        .catch(function (err) {
+            console.error('Error accessing media devices: ', err);
+        });
+    </script>
+
+<h2>chat box</h2>
+            <div class="chat-section">
+                <div class="chat-box">
+                    <div class="messages">
+                        <!-- Messages will go here -->
+                    </div>
+                    <input type="text" placeholder="Type a message...">
+                    <button>Send</button>
+                </div>
+            </div>
+
+            <!-- File Sharing Section -->
+            <div class="file-section">
+                <form class="file-upload-form">
+                    <h2>Share Files</h2>
+                    <input type="file">
+                    <button type="submit">Upload</button>
+                </form>
+                <div class="file-list">
+                    <!-- List of files will go here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+  // Chat Functionality
+    document.querySelector('.chat-box button').addEventListener('click', function() {
+        const messageInput = document.querySelector('.chat-box input[type="text"]');
+        const message = messageInput.value.trim();
+        if (message) {
+            const messagesContainer = document.querySelector('.messages');
+            messagesContainer.innerHTML += '<div>' + message + '</div>';
+            messageInput.value = ''; // Clear the input field
+        }
+    });
+
+    // File Upload Display
+    document.querySelector('.file-upload-form input[type="file"]').addEventListener('change', function(event) {
+        const fileList = document.querySelector('.file-list');
+        const files = event.target.files;
+        fileList.innerHTML = ''; // Clear existing list
+
+        for (let i = 0; i < files.length; i++) {
+            fileList.innerHTML += '<div>' + files[i].name + '</div>';
+        }
+    });
+</script>
+
+
+<center><a href="i.html">Click to go back</a></center>
+</body>
+</html>
